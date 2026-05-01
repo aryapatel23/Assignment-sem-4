@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Java Assignment - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.72) 35%, rgba(240, 240, 240, 0.95) 100%),
+                linear-gradient(180deg, #111111 0%, #f4f4f4 100%);
+            color: #111111;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: #111111;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: none;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #d9d9d9;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #111111 0%, #2b2b2b 100%);
+            color: white;
+            border-bottom: 4px solid #000000;
+        }
+
+        .card-header h2 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #111111;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #111111;
+            box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #111111 0%, #2b2b2b 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .response.success {
+            background-color: #f2f2f2;
+            color: #111111;
+            border: 2px solid #111111;
+            display: block;
+        }
+
+        .response.error {
+            background-color: #ffffff;
+            color: #111111;
+            border: 2px solid #7a7a7a;
+            display: block;
+        }
+
+        .response.info {
+            background-color: #fafafa;
+            color: #222222;
+            border: 2px solid #bbbbbb;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            border: 3px solid #e6e6e6;
+            border-top: 3px solid #111111;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .flight-info {
+            background: #f7f7f7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #111111;
+        }
+
+        .flight-info h4 {
+            color: #111111;
+            margin-bottom: 8px;
+        }
+
+        .flight-info p {
+            font-size: 0.9em;
+            color: #555;
+            margin: 4px 0;
+        }
+
+        .footer {
+            text-align: center;
+            color: #111111;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255,255,255,0.84);
+            border: 1px solid #d9d9d9;
+            border-radius: 12px;
+        }
+
+        .footer p {
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #111111;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        .status-badge.offline {
+            background: #555555;
+        }
+
+        .api-status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fafafa;
+            border: 1px solid #dedede;
+            border-radius: 6px;
+            text-align: center;
+            color: #111111;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .data-panel {
+            border: 1px solid #d9d9d9;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .data-panel h3 {
+            padding: 16px 18px;
+            background: #111111;
+            color: #ffffff;
+            font-size: 1.05em;
+        }
+
+        .data-panel .panel-body {
+            padding: 18px;
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        .data-meta {
+            margin-bottom: 12px;
+            color: #555555;
+            font-size: 0.9em;
+        }
+
+        .data-list {
+            list-style: none;
+        }
+
+        .data-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ececec;
+        }
+
+        .data-list li:last-child {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            padding: 16px;
+            border: 1px dashed #b5b5b5;
+            background: #fafafa;
+            color: #555555;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .table-response {
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        table th {
+            background: #111111;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tr:hover {
+            background: #f2f2f2;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge.success {
+            background: #111111;
+            color: #ffffff;
+        }
+
+        .badge.warning {
+            background: #e6e6e6;
+            color: #111111;
+        }
+
+        .badge.danger {
+            background: #d9d9d9;
+            color: #111111;
+        }
+
+        h4 {
+            color: #111111;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advanced Java Assignment Dashboard</h1>
+            <p>Test Q1 (Flight Booking), Q2 (Registration), and Q3 (Student Management)</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- Q2: Registration -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Q2: User Registration</h2>
+                    <p>Simple REST endpoint with RequestParam</p>
+                </div>
+                <div class="card-body">
+                    <form id="q2Form">
+                        <div class="form-group">
+                            <label for="q2Name">Full Name</label>
+                            <input type="text" id="q2Name" placeholder="e.g., John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="q2Email">Email Address</label>
+                            <input type="email" id="q2Email" placeholder="e.g., john@example.com" required>
+                        </div>
+                        <button type="button" onclick="submitQ2()">Register User</button>
+                        <div class="loading" id="q2Loading">
+                            <div class="spinner"></div>
+                        </div>
+                        <div class="response" id="q2Response"></div>
+                    </form>
+                    <div class="api-status">
+                        <strong>Endpoint:</strong> POST /api/register
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q1: Flight Booking -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Q1: Flight Booking</h2>
+                    <p>JDBC with Transaction Management</p>
+                </div>
+                <div class="card-body">
+                    <div class="flight-info">
+                        <h4>Available Flights:</h4>
+                        <p><strong>Flight 1:</strong> AI-101 Mumbai to Delhi | 100 seats | ₹5000/seat</p>
+                        <p><strong>Flight 2:</strong> BA-202 London to Paris | 80 seats | ₹8000/seat</p>
+                        <p><strong>Flight 3:</strong> SG-303 Singapore Express | 120 seats | ₹6500/seat</p>
+                    </div>
+                    <form id="q1Form">
+                        <div class="form-group">
+                            <label for="q1FlightId">Select Flight</label>
+                            <select id="q1FlightId" required>
+                                <option value="">-- Choose a Flight --</option>
+                                <option value="1">AI-101 Mumbai to Delhi (₹5000/seat)</option>
+                                <option value="2">BA-202 London to Paris (₹8000/seat)</option>
+                                <option value="3">SG-303 Singapore Express (₹6500/seat)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="q1Passenger">Passenger Name</label>
+                            <input type="text" id="q1Passenger" placeholder="e.g., Alice Smith" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="q1Seats">Number of Seats</label>
+                            <input type="number" id="q1Seats" min="1" max="200" placeholder="e.g., 5" required>
+                        </div>
+                        <button type="button" onclick="submitQ1()">Book Flight</button>
+                        <div class="loading" id="q1Loading">
+                            <div class="spinner"></div>
+                        </div>
+                        <div class="response" id="q1Response"></div>
+                    </form>
+                    <div class="api-status">
+                        <strong>Endpoint:</strong> POST /api/book
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q3: Student Registration -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Q3: Student Management</h2>
+                    <p>Spring Data JPA with PostgreSQL</p>
+                </div>
+                <div class="card-body">
+                    <form id="q3Form">
+                        <div class="form-group">
+                            <label for="q3Name">Student Name</label>
+                            <input type="text" id="q3Name" placeholder="e.g., Raj Kumar" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="q3Email">Email (Unique)</label>
+                            <input type="email" id="q3Email" placeholder="e.g., raj@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="q3Course">Course</label>
+                            <input type="text" id="q3Course" placeholder="e.g., B.Tech Computer Science" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="q3Phone">Phone (10 digits)</label>
+                            <input type="text" id="q3Phone" placeholder="e.g., 9876543210" pattern="[0-9]{10}">
+                        </div>
+                        <button type="button" onclick="submitQ3()">Register Student</button>
+                        <div class="loading" id="q3Loading">
+                            <div class="spinner"></div>
+                        </div>
+                        <div class="response" id="q3Response"></div>
+                    </form>
+                    <div class="api-status">
+                        <strong>Endpoint:</strong> POST /api/student/register
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Info -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Database Information</h2>
+                <p>PostgreSQL Configuration & Statistics</p>
+            </div>
+            <div class="card-body">
+                <div class="two-column">
+                    <div>
+                        <h4 style="margin-bottom: 10px;">Database Details</h4>
+                        <p><strong>Database Server:</strong> PostgreSQL 17</p>
+                        <p><strong>Host:</strong> localhost:5432</p>
+                        <p><strong>Student DB:</strong> studentdb</p>
+                        <p><strong>Airline DB:</strong> airlinedb</p>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 10px;">Tables</h4>
+                        <p><strong>Q1 Tables:</strong> flights, bookings</p>
+                        <p><strong>Q3 Table:</strong> students (auto-created)</p>
+                        <p><strong>Auto Schema:</strong> Enabled (ddl-auto=update)</p>
+                    </div>
+                </div>
+                <button onclick="checkServerStatus()" style="margin-top: 20px;">Check Server Status</button>
+                <div class="response" id="statusResponse"></div>
+            </div>
+        </div>
+
+        <!-- Live Data Preview -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Live Data Preview</h2>
+                <p>Records shown from PostgreSQL so your sir can see the saved data below</p>
+            </div>
+            <div class="card-body">
+                <button type="button" onclick="loadDashboardData()">Refresh Data</button>
+                <div class="loading" id="dataLoading">
+                    <div class="spinner"></div>
+                </div>
+                <div class="response" id="dataResponse"></div>
+                <div class="data-grid" id="dataGrid">
+                    <div class="data-panel">
+                        <h3>Flights</h3>
+                        <div class="panel-body">
+                            <div class="empty-state">Loading flights...</div>
+                        </div>
+                    </div>
+                    <div class="data-panel">
+                        <h3>Bookings</h3>
+                        <div class="panel-body">
+                            <div class="empty-state">Loading bookings...</div>
+                        </div>
+                    </div>
+                    <div class="data-panel">
+                        <h3>Students</h3>
+                        <div class="panel-body">
+                            <div class="empty-state">Loading students...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Advanced Java Assignment - All 3 Questions Implemented</strong></p>
+            <p>Q1: JDBC with Transactions | Q2: Spring REST | Q3: JPA with PostgreSQL</p>
+            <p>Server: http://localhost:8080 | Last Updated: April 30, 2026</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+
+        // Q2: User Registration
+        async function submitQ2() {
+            const name = document.getElementById('q2Name').value.trim();
+            const email = document.getElementById('q2Email').value.trim();
+
+            if (!name || !email) {
+                showResponse('q2Response', 'Please fill all fields', 'error');
+                return;
+            }
+
+            showLoading('q2Loading', true);
+            try {
+                const response = await fetch(`${API_BASE}/register?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`, {
+                    method: 'POST'
+                });
+                const text = await response.text();
+                
+                if (response.ok) {
+                    showResponse('q2Response', `✅ ${text}`, 'success');
+                    document.getElementById('q2Form').reset();
+                } else {
+                    showResponse('q2Response', `❌ ${text}`, 'error');
+                }
+            } catch (error) {
+                showResponse('q2Response', `❌ Error: ${error.message}`, 'error');
+            } finally {
+                showLoading('q2Loading', false);
+            }
+        }
+
+        // Q1: Flight Booking
+        async function submitQ1() {
+            const flightId = document.getElementById('q1FlightId').value;
+            const passenger = document.getElementById('q1Passenger').value.trim();
+            const seats = document.getElementById('q1Seats').value;
+
+            if (!flightId || !passenger || !seats) {
+                showResponse('q1Response', 'Please fill all fields', 'error');
+                return;
+            }
+
+            if (seats <= 0 || seats > 200) {
+                showResponse('q1Response', 'Seats must be between 1 and 200', 'error');
+                return;
+            }
+
+            showLoading('q1Loading', true);
+            try {
+                const response = await fetch(
+                    `${API_BASE}/book?flightId=${flightId}&passengerName=${encodeURIComponent(passenger)}&seatsRequested=${seats}`,
+                    { method: 'POST' }
+                );
+                const text = await response.text();
+                
+                if (response.ok && text.includes('Successful')) {
+                    showResponse('q1Response', `✅ ${text}`, 'success');
+                    document.getElementById('q1Form').reset();
+                } else {
+                    showResponse('q1Response', `⚠️ ${text}`, 'error');
+                }
+            } catch (error) {
+                showResponse('q1Response', `❌ Error: ${error.message}`, 'error');
+            } finally {
+                showLoading('q1Loading', false);
+            }
+        }
+
+        // Q3: Student Registration
+        async function submitQ3() {
+            const name = document.getElementById('q3Name').value.trim();
+            const email = document.getElementById('q3Email').value.trim();
+            const course = document.getElementById('q3Course').value.trim();
+            const phone = document.getElementById('q3Phone').value.trim();
+
+            if (!name || !email || !course) {
+                showResponse('q3Response', 'Name, Email, and Course are required', 'error');
+                return;
+            }
+
+            if (phone && !/^\d{10}$/.test(phone)) {
+                showResponse('q3Response', 'Phone must be exactly 10 digits', 'error');
+                return;
+            }
+
+            showLoading('q3Loading', true);
+            try {
+                const response = await fetch(`${API_BASE}/student/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        course: course,
+                        phone: phone || null
+                    })
+                });
+                const text = await response.text();
+                
+                if (response.ok) {
+                    showResponse('q3Response', `✅ ${text}`, 'success');
+                    document.getElementById('q3Form').reset();
+                } else {
+                    showResponse('q3Response', `⚠️ ${text}`, 'error');
+                }
+            } catch (error) {
+                showResponse('q3Response', `❌ Error: ${error.message}`, 'error');
+            } finally {
+                showLoading('q3Loading', false);
+            }
+        }
+
+        // Check Server Status
+        async function checkServerStatus() {
+            showLoading('statusResponse', true);
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const text = await response.text();
+                showResponse('statusResponse', `✅ ${text}`, 'success');
+            } catch (error) {
+                showResponse('statusResponse', `❌ Server is offline: ${error.message}`, 'error');
+            } finally {
+                showLoading('statusResponse', false);
+            }
+        }
+
+        async function loadDashboardData() {
+            const dataLoading = document.getElementById('dataLoading');
+            const dataResponse = document.getElementById('dataResponse');
+            const dataGrid = document.getElementById('dataGrid');
+
+            showLoading('dataLoading', true);
+            dataResponse.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/dashboard/data`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data?.message || 'Unable to load dashboard data');
+                }
+
+                dataGrid.innerHTML = `
+                    <div class="data-panel">
+                        <h3>Flights</h3>
+                        <div class="panel-body">
+                            <div class="data-meta">${data.flights.length} record(s)</div>
+                            ${renderFlightList(data.flights)}
+                        </div>
+                    </div>
+                    <div class="data-panel">
+                        <h3>Bookings</h3>
+                        <div class="panel-body">
+                            <div class="data-meta">${data.bookings.length} record(s)</div>
+                            ${renderBookingList(data.bookings)}
+                        </div>
+                    </div>
+                    <div class="data-panel">
+                        <h3>Students</h3>
+                        <div class="panel-body">
+                            <div class="data-meta">${data.students.length} record(s)</div>
+                            ${renderStudentList(data.students)}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                dataResponse.textContent = `❌ ${error.message}`;
+                dataResponse.className = 'response error';
+                dataResponse.style.display = 'block';
+                dataGrid.innerHTML = `
+                    <div class="data-panel">
+                        <h3>Flights</h3>
+                        <div class="panel-body"><div class="empty-state">Unable to load flights</div></div>
+                    </div>
+                    <div class="data-panel">
+                        <h3>Bookings</h3>
+                        <div class="panel-body"><div class="empty-state">Unable to load bookings</div></div>
+                    </div>
+                    <div class="data-panel">
+                        <h3>Students</h3>
+                        <div class="panel-body"><div class="empty-state">Unable to load students</div></div>
+                    </div>
+                `;
+            } finally {
+                showLoading('dataLoading', false);
+            }
+        }
+
+        function renderFlightList(flights) {
+            if (!flights || flights.length === 0) {
+                return '<div class="empty-state">No flights found.</div>';
+            }
+
+            return `<ul class="data-list">${flights.map(flight => `
+                <li>
+                    <strong>${flight.flightName}</strong><br>
+                    ID: ${flight.flightId} | Seats: ${flight.availableSeats} | Price: ₹${Number(flight.pricePerSeat).toLocaleString('en-IN')}
+                </li>
+            `).join('')}</ul>`;
+        }
+
+        function renderBookingList(bookings) {
+            if (!bookings || bookings.length === 0) {
+                return '<div class="empty-state">No bookings found.</div>';
+            }
+
+            return `<ul class="data-list">${bookings.map(booking => `
+                <li>
+                    <strong>${booking.passengerName}</strong><br>
+                    Booking #${booking.bookingId} | Flight ID: ${booking.flightId} | Seats: ${booking.seatsBooked} | Total: ₹${Number(booking.totalAmount).toLocaleString('en-IN')}<br>
+                    Date: ${booking.bookingDate}
+                </li>
+            `).join('')}</ul>`;
+        }
+
+        function renderStudentList(students) {
+            if (!students || students.length === 0) {
+                return '<div class="empty-state">No students found.</div>';
+            }
+
+            return `<ul class="data-list">${students.map(student => `
+                <li>
+                    <strong>${student.name}</strong><br>
+                    ID: ${student.id} | Email: ${student.email}<br>
+                    Course: ${student.course} | Phone: ${student.phone || 'N/A'}
+                </li>
+            `).join('')}</ul>`;
+        }
+
+        // Helper Functions
+        function showResponse(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `response ${type}`;
+            element.style.display = 'block';
+            element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function showLoading(elementId, show) {
+            document.getElementById(elementId).style.display = show ? 'block' : 'none';
+        }
+
+        // Check server on page load
+        window.addEventListener('load', function() {
+            setTimeout(checkServerStatus, 500);
+            setTimeout(loadDashboardData, 700);
+        });
+
+        // Auto-calculate total amount for Q1
+        document.getElementById('q1Seats').addEventListener('change', function() {
+            const flightId = document.getElementById('q1FlightId').value;
+            const seats = parseInt(this.value) || 0;
+            const prices = { '1': 5000, '2': 8000, '3': 6500 };
+            const price = prices[flightId] || 0;
+            const total = seats * price;
+            
+            if (total > 0) {
+                showResponse('q1Response', `Estimated Total: ₹${total.toLocaleString('en-IN')}`, 'info');
+            }
+        });
+
+        document.getElementById('q1FlightId').addEventListener('change', function() {
+            const seatsInput = document.getElementById('q1Seats');
+            if (seatsInput.value) {
+                seatsInput.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+</body>
+</html>

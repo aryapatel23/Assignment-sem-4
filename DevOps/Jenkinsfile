@@ -1,0 +1,97 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                // Navigate to the "practical" directory where the pom.xml is located
+                dir('practical') {
+                    script {
+                        // Check if the Jenkins agent is Unix-based (Linux/Mac) or Windows
+                        if (isUnix()) {
+                            sh 'chmod +x mvnw'
+                            sh './mvnw clean compile'
+                        } else {
+                            bat 'mvnw.cmd clean compile'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                dir('practical') {
+                    script {
+                        if (isUnix()) {
+                            sh './mvnw test'
+                        } else {
+                            bat 'mvnw.cmd test'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Package') {
+            steps {
+                dir('practical') {
+                    script {
+                        if (isUnix()) {
+                            sh './mvnw package -DskipTests'
+                        } else {
+                            bat 'mvnw.cmd package -DskipTests'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Publish') {
+            steps {
+                dir('practical') {
+                    script {
+                        // Print the static HTML file (if present)
+                        if (fileExists('jenkins-info.html')) {
+                            if (isUnix()) {
+                                sh 'echo "---- Jenkins static HTML ----"'
+                                sh 'cat jenkins-info.html'
+                            } else {
+                                bat 'echo ---- Jenkins static HTML ---- & type jenkins-info.html'
+                            }
+                        }
+
+
+                                                // Create a dynamic HTML file with basic build info (safe result value)
+                                                def result = currentBuild?.currentResult ?: 'IN_PROGRESS'
+                                                def html = """<html>
+<head><meta charset=\"utf-8\"><title>Jenkins Build Info</title></head>
+<body>
+    <h1>Jenkins Build Info</h1>
+    <ul>
+        <li>Job: ${env.JOB_NAME}</li>
+        <li>Build: ${env.BUILD_NUMBER}</li>
+        <li>Result: ${result}</li>
+        <li>Timestamp: ${new Date().toString()}</li>
+    </ul>
+</body>
+</html>"""
+
+                                                writeFile file: 'jenkins-build-info.html', text: html
+
+                        // Print the dynamic HTML file so it appears in the Jenkins console log
+                        if (isUnix()) {
+                            sh 'echo "---- Jenkins dynamic HTML ----"'
+                            sh 'cat jenkins-build-info.html'
+                        } else {
+                            bat 'echo ---- Jenkins dynamic HTML ---- & type jenkins-build-info.html'
+                        }
+
+                        // Archive both files as build artifacts (paths are relative because we're in dir('practical'))
+                        archiveArtifacts artifacts: 'jenkins-info.html, jenkins-build-info.html', fingerprint: true, allowEmptyArchive: true
+                    }
+                }
+            }
+        }
+    }
+}
